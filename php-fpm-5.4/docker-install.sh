@@ -32,6 +32,29 @@ run() {
 	sh -c "LANG=C LC_ALL=C ${_cmd}"
 }
 
+log() {
+	_lvl="${1}"
+	_msg="${2}"
+
+	_clr_ok="\033[0;32m"
+	_clr_info="\033[0;34m"
+	_clr_warn="\033[0;33m"
+	_clr_err="\033[0;31m"
+	_clr_rst="\033[0m"
+
+	if [ "${_lvl}" = "ok" ]; then
+		printf "${_clr_ok}[OK]   %s${_clr_rst}\n" "${_msg}"
+	elif [ "${_lvl}" = "info" ]; then
+		printf "${_clr_info}[INFO] %s${_clr_rst}\n" "${_msg}"
+	elif [ "${_lvl}" = "warn" ]; then
+		printf "${_clr_warn}[WARN] %s${_clr_rst}\n" "${_msg}" 1>&2	# stdout -> stderr
+	elif [ "${_lvl}" = "err" ]; then
+		printf "${_clr_err}[ERR]  %s${_clr_rst}\n" "${_msg}" 1>&2	# stdout -> stderr
+	else
+		printf "${_clr_err}[???]  %s${_clr_rst}\n" "${_msg}" 1>&2	# stdout -> stderr
+	fi
+}
+
 
 ################################################################################
 # MAIN ENTRY POINT
@@ -307,3 +330,29 @@ fi
 run "chmod 0755 ${MY_LOG_DIR}"
 run "chmod -R 0644 ${MY_LOG_DIR}/*"
 run "chown -R ${MY_USER}:${MY_GROUP} ${MY_LOG_DIR}"
+
+print_headline "8. Adjust Timezone"
+###
+### Adjust timezone
+###
+if ! set | grep '^TIMEZONE='  >/dev/null 2>&1; then
+	log "warn" "\$TIMEZONE not set."
+	log "warn" "Setting PHP: timezone=America/Sao_Paulo"
+	run "sed -i'' 's|;*date.timezone[[:space:]]*=.*$|date.timezone = America/Sao_Paulo|g' /etc/php.ini"
+else
+	if [ -f "/usr/share/zoneinfo/${TIMEZONE}" ]; then
+		# Unix Time
+		log "info" "Setting docker timezone to: ${TIMEZONE}"
+		run "rm /etc/localtime"
+		run "ln -s /usr/share/zoneinfo/${TIMEZONE} /etc/localtime"
+
+		# PHP Time
+		log "info" "Setting PHP: timezone=${TIMEZONE}"
+		run "sed -i'' 's|;*date.timezone[[:space:]]*=.*$|date.timezone = ${TIMEZONE}|g' /etc/php.ini"
+	else
+		log "err" "Invalid timezone for \$TIMEZONE."
+		log "err" "\$TIMEZONE: '${TIMEZONE}' does not exist."
+		exit 1
+	fi
+fi
+log "info" "Docker date set to: $(date)"
