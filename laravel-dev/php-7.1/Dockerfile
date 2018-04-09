@@ -16,9 +16,9 @@ RUN curl -sS https://getcomposer.org/installer | php -- \
   && composer global require --quiet hirak/prestissimo:^0.3
 
 # Install NodeJS + Yarn
-ENV NODE_ALPINE_VERSION 9.10.1-r1
+ENV NODE_ALPINE_VERSION 8.10.0-r0
 ENV YARN_VERSION v1.5.1
-RUN apk --no-cache add nodejs-current=$NODE_ALPINE_VERSION --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/main/ \
+RUN apk --no-cache add nodejs-npm=$NODE_ALPINE_VERSION --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/main/ \
   && curl -O -sL https://github.com/yarnpkg/yarn/releases/download/$YARN_VERSION/yarn-$YARN_VERSION.tar.gz \
   && mkdir /usr/local/yarn \
   && tar -C /usr/local/yarn --strip-components=1 -zxvf yarn-$YARN_VERSION.tar.gz \
