@@ -20,7 +20,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- \
 # Install NodeJS + Yarn
 ENV NODE_ALPINE_VERSION 8.11.3-r3
 ENV YARN_VERSION v0.21.3
-RUN apk --no-cache -v add npm=$NODE_ALPINE_VERSION \
+RUN apk --no-cache add npm=$NODE_ALPINE_VERSION \
   && curl -O -sL https://github.com/yarnpkg/yarn/releases/download/$YARN_VERSION/yarn-$YARN_VERSION.tar.gz \
   && mkdir /usr/local/yarn \
   && tar -C /usr/local/yarn --strip-components=1 -zxvf yarn-$YARN_VERSION.tar.gz \
