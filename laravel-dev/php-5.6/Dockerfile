@@ -1,16 +1,15 @@
-FROM php:5.6.30-fpm-alpine
+FROM php:5.6.37-fpm-alpine3.7
 LABEL maintainer="Nikolas Silva <nikolas.rsilva@gmail.com>"
 
 RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories
 RUN apk update && apk --no-cache add \
-  apk-tools=2.10.0-r1 \
   curl \
   git \
   openssh \
   openssl
 
 # Install Composer w/ Prestissimo
-ENV COMPOSER_VERSION 1.3.2
+ENV COMPOSER_VERSION 1.7.1
 RUN curl -sS https://getcomposer.org/installer | php -- \
     --install-dir=/usr/local/bin \
     --filename=composer \
